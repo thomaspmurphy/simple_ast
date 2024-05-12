@@ -22,7 +22,7 @@ enum Token {
     RightParen,
 }
 
-fn tokenize(input: &str) -> Vec<Token> {
+fn tokenise(input: &str) -> Vec<Token> {
     let mut tokens = Vec::new();
     let mut iter = input.chars().peekable();
 
@@ -132,9 +132,20 @@ fn parse_factor(tokens: &[Token], index: usize) -> (Node, usize) {
 }
 
 fn build_ast(input: &str) -> Node {
-    let tokens = tokenize(input);
+    let tokens = tokenise(input);
     let (ast, _) = parse_expression(&tokens, 0);
     ast
+}
+
+fn visualise_ast(node: &Node, level: usize) {
+    match node {
+        Node::Literal(value) => println!("{}- Literal({})", "|   ".repeat(level), value),
+        Node::BinOp(op, lhs, rhs) => {
+            println!("{}- BinOp({:?})", "|   ".repeat(level), op);
+            visualise_ast(lhs, level + 1);
+            visualise_ast(rhs, level + 1);
+        }
+    }
 }
 
 fn main() {
@@ -146,5 +157,5 @@ fn main() {
 
     let input = input.trim(); // Remove trailing newline
     let ast = build_ast(input);
-    println!("{:?}", ast);
+    visualise_ast(&ast, 0);
 }
